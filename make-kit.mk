@@ -17,5 +17,6 @@ publish: pre-publish
 	make publish-common release-draft-upload
 	@# (After common publication)
 	@echo ">>>> publish complete OK.  <<<"
-	@echo ">>>> Manually publish the release from this URL when satisfied: <<<<"
+	@echo ">>>> Manually publish the release from this URL when satisfied, <<<<"
+	@echo ">>>> and then change ./version to avoid accidental confusion. <<<<"
 	cat tmp/draft-url
