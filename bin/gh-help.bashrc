@@ -6,6 +6,8 @@ gh-help-semaphore() {
 
 GH_HELP_BASE="${GH_HELP_BASE:-$HOME/.local/bin/gh-help}"
 
+[[ -f ~/.gh-helprc ]] && source ~/.gh-helprc
+
 gh() {
     #help: wrap the Github gh cli
     ${GH_HELP_BASE}/gh-help.sh "$@"

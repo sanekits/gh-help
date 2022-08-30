@@ -31,7 +31,14 @@ stub() {
    builtin echo "  <<< STUB[$*] >>> " >&2
 }
 main() {
-    builtin echo "Hello gh-help, shellkit edition: args:[$*]"
+    if [[ $1 == "-e" ]]; then
+        shift
+        source ~/.gh-helprc
+        [[ -n $GH_HOST_ENTERPRISE ]] || die "-e option specified, but GH_HOST_ENTERPRISE is not defined in ~/.gh-helprc.  So I don't know where your Github Enterprise server is located and can't help."
+        export GH_HOST=$GH_HOST_ENTERPRISE
+    fi
+
+    command gh "$@"
 }
 
 [[ -z ${sourceMe} ]] && {
