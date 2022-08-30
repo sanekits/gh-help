@@ -18,4 +18,4 @@ publish: pre-publish
 	@# (After common publication)
 	@echo ">>>> publish complete OK.  <<<"
 	@echo ">>>> Manually publish the release from this URL when satisfied: <<<<"
-	@echo "   $(cat tmp/draft-url)"
+	cat tmp/draft-url
