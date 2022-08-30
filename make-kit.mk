@@ -16,5 +16,6 @@ publish: pre-publish
 	@# TODO: you can customize publication by adding steps here (before publish-common)
 	make publish-common release-draft-upload
 	@# (After common publication)
-	@echo publish complete OK.  Manually publish the release from this URL when satisfied:
-	@cat tmp/draft-url
+	@echo >>>> publish complete OK.  <<<
+	@echo >>>> Manually publish the release from this URL when satisfied: <<<<
+	@echo "   $(cat tmp/draft-url)"
