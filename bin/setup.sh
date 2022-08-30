@@ -31,10 +31,37 @@ die() {
     builtin exit 1
 }
 
+make_gh_helprc() {
+    cat <<-EOF
+# gh-helprc
+#   See https://github.com/stabledog/gh-help
+
+# TODO: set this to point to the hostname for your Github Enterprise server
+#  Then you can pass "-e" as the first argument to "gh-help.sh" so that the
+#  gh command uses the enterprise host instead of github.com for operations.
+export GH_HOST_ENTERPRISE=myenterprise.local
+
+EOF
+}
+
 main() {
     Script=${scriptName} main_base "$@"
     builtin cd ${HOME}/.local/bin || die 208
-    # TODO: kit-specific steps can be added here
+
+    [[ -f ~/.gh-helprc ]] && {
+        make_gh_helprc > ~/.gh-helprc.proposed
+        command diff ~/.gh-helprc.proposed ~/.gh-helprc && {
+            command rm ~/.gh-helprc.proposed
+        } || {
+            (
+                builtin echo "WARNING: contents of ~/.gh-helprc does not match ~/.gh-helprc.proposed."
+                builtin echo "Manually diff the files and merge changes if needed."
+            ) >&2
+        }
+    } || {
+        make_gh_helprc > ~/.gh-helprc
+        builtin echo "~/.gh-helprc has been created: review and customize this file."
+    }
 }
 
 [[ -z ${sourceMe} ]] && {

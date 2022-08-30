@@ -1,7 +1,10 @@
 #!/bin/bash
 # gh-help.sh
-#  This script can be removed if you don't need it -- and if you do
-# that you should remove the entry from _symlinks_ and make-kit.mk also.
+#  This wrapper forwards args to the Github 'gh' cli.  Except:
+#   - When first arg is "-e", which will set the GH_HOST environment
+#     variable to the value of GH_HOST_ENTERPRISE.
+#     This behavior solves a shortcoming of the current 'gh' command line,
+#     which does not always provide explicit specification of the host.
 
 canonpath() {
     builtin type -t realpath.sh &>/dev/null && {
