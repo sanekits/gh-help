@@ -34,12 +34,16 @@ die() {
 make_gh_helprc() {
     cat <<-EOF
 # gh-helprc
-#   See https://github.com/stabledog/gh-help
+#   See https://github.com/sanekits/gh-help
 
 # TODO: set this to point to the hostname for your Github Enterprise server
 #  Then you can pass "-e" as the first argument to "gh-help.sh" so that the
 #  gh command uses the enterprise host instead of github.com for operations.
 export GH_HOST_ENTERPRISE=myenterprise.local
+
+# TODO: uncomment this alias if you want to use 'ghe' as a shortcut with
+# Github Enterprise:
+# alias ghe='gh-help.sh -e'
 
 EOF
 }
