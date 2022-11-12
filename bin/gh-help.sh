@@ -38,7 +38,9 @@ main() {
         export GH_HOST=$GH_HOST_ENTERPRISE
     fi
 
-    command gh "$@"
+    command gh "$@" || {
+        echo "\$GH_HOST=$GH_HOST -- see ~/.gh-helprc for config"
+    }
 }
 
 [[ -z ${sourceMe} ]] && {

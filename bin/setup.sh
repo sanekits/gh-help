@@ -66,6 +66,15 @@ main() {
         make_gh_helprc > ~/.gh-helprc
         builtin echo "~/.gh-helprc has been created: review and customize this file."
     }
+    type -P gh || {
+        echo "WARNING: no 'gh' command found on the PATH.  If it's not installed, try $PWD/gh-help/gh-install.sh"
+    }
+    # FINALIZE: perms on ~/.local/bin/<Kitname>.  We want others/group to be
+    # able to traverse dirs and exec scripts, so that a source installation can
+    # be replicated to a dest from the same file system (e.g. docker containers,
+    # nfs-mounted home nets, etc)
+    command chmod og+rX ${HOME}/.local/bin/${Kitname} -R
+    command chmod og+rX ${HOME}/.local ${HOME}/.local/bin
 }
 
 [[ -z ${sourceMe} ]] && {
