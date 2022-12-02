@@ -11,6 +11,7 @@ kit_depends := \
     bin/gh-help.bashrc \
     bin/gh-help.sh
 
+pre-publish: conformity-check
 
 publish: pre-publish
 	@# TODO: you can customize publication by adding steps here (before publish-common)
