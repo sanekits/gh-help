@@ -1,10 +1,5 @@
 #!/bin/bash
 # gh-help.sh
-#  This wrapper forwards args to the Github 'gh' cli.  Except:
-#   - When first arg is "-e", which will set the GH_HOST environment
-#     variable to the value of GH_HOST_ENTERPRISE.
-#     This behavior solves a shortcoming of the current 'gh' command line,
-#     which does not always provide explicit specification of the host.
 
 canonpath() {
     builtin type -t realpath.sh &>/dev/null && {
@@ -22,25 +17,25 @@ canonpath() {
 scriptName="$(canonpath "$0")"
 scriptDir=$(command dirname -- "${scriptName}")
 
+
 die() {
     builtin echo "ERROR($(command basename -- ${scriptName})): $*" >&2
     builtin exit 1
 }
 
-stub() {
-   builtin echo "  <<< STUB[$*] >>> " >&2
-}
 main() {
-    if [[ $1 == "-e" ]]; then
-        shift
-        source ~/.gh-helprc
-        [[ -n $GH_HOST_ENTERPRISE ]] || die "-e option specified, but GH_HOST_ENTERPRISE is not defined in ~/.gh-helprc.  So I don't know where your Github Enterprise server is located and can't help."
-        export GH_HOST=$GH_HOST_ENTERPRISE
-    fi
-
-    command gh "$@" || {
-        echo "\$GH_HOST=$GH_HOST -- see ~/.gh-helprc for config"
+    which gh || {
+        gh_setup_advise
+        exit
     }
+    echo "Run 'gh help' or 'ghe help' (for the Enterprise edition)"
+    echo
+    echo "To setup authentication, run 'gh auth login' or 'ghe auth login'"
+    echo
+    echo "Tip: If bash autocompletion isn't working at the shell prompt, verify that the"
+    echo "bash-completion DPKG package is installed (e.g. 'apt-get install bash-completion')"
+    echo "and the 'bashics' shellkit (e.g. 'shpm install bashics')"
+    echo
 }
 
 [[ -z ${sourceMe} ]] && {
