@@ -13,12 +13,7 @@ kit_depends := \
 
 pre-publish: conformity-check
 
-publish: pre-publish
-	@# TODO: you can customize publication by adding steps here (before publish-common)
-	make publish-common release-draft-upload
-	@# (After common publication)
-	gh release list | sort -n
-	@echo ">>>> publish complete OK.  <<<"
-	@echo ">>>> Manually publish the release from this URL when satisfied, <<<<"
-	@echo ">>>> and then change ./version to avoid accidental confusion. <<<<"
+publish: pre-publish publish-common release-upload release-list
+
 	cat tmp/draft-url
+	@echo ">>>> publish complete OK. (FINAL)  <<<"
