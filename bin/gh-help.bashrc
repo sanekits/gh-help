@@ -17,12 +17,9 @@ if which gh &>/dev/null; then
     fi
 fi
 
-true
+alias ghil='gh issue list'
+alias ghic='gh issue create'
+alias ghpl='gh issue list'
+alias ghpr='gh pr create'
 
-# gh() {
-#     #help: wrap the Github gh cli
-#     local gh_install_url="https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
-#     type -P gh &>/dev/null || return $(die "no 'gh' command installed on the PATH, visit $gh_install_url")
-#     [[ -x ${GH_HELP_BASE}/gh-help.sh ]] || return $(die "Can't find ${GH_HELP_BASE}/gh-help.sh")
-#     ${GH_HELP_BASE}/gh-help.sh "$@"
-# }
+true

@@ -24,18 +24,23 @@ die() {
 }
 
 main() {
-    which gh || {
-        gh_setup_advise
-        exit
-    }
-    echo "Run 'gh help' or 'ghe help' (for the Enterprise edition)"
-    echo
-    echo "To setup authentication, run 'gh auth login' or 'ghe auth login'"
-    echo
-    echo "Tip: If bash autocompletion isn't working at the shell prompt, verify that the"
-    echo "bash-completion DPKG package is installed (e.g. 'apt-get install bash-completion')"
-    echo "and the 'bashics' shellkit (e.g. 'shpm install bashics')"
-    echo
+cat <<-XEOF
+Run 'gh help' or 'ghe help' (for the Enterprise edition)
+
+- To setup authentication, run 'gh auth login' or 'ghe auth login'
+
+- $EDITOR ~/.gh-helprc # User-editable options for this kit
+
+- If bash autocompletion isn't working at the shell prompt, verify that the
+bash-completion DPKG package is installed (e.g. 'apt-get install bash-completion')
+and the 'bashics' shellkit (e.g. 'shpm install bashics')
+
+Commands:
+ghil  # gh issue list  << List issues for this repo
+ghic  # gh issue create  << Create issue in this repo
+ghpl  # gh pr list     << List PRs for this repo
+ghpr  # gh pr create   << Create PR for this repo
+XEOF
 }
 
 [[ -z ${sourceMe} ]] && {
