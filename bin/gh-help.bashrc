@@ -34,7 +34,7 @@ gh_pub() {
 
 alias ghe=gh_enterprise
 alias gh=gh_pub
-complete -F _complete_alias ghe &>/dev/null
+complete -o default -F __start_gh ghe &>/dev/null
 
 alias ghil='gh issue list'
 alias ghic='gh issue create'
