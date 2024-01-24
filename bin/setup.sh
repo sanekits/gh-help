@@ -40,8 +40,9 @@ make_gh_helprc() {
 
 # If Enterprise gh is available, set hostname here:
 export GH_HOST_ENTERPRISE=bbgithub.dev.bloomberg.com
-# Also, the `ghe` command expects that GH_ENTERPRISE_TOKEN is
-# defined by the environment.
+# Also, the `ghe` command expects that GH_ENTERPRISE_TOKEN_2 or
+# GH_ENTERPRISE_TOKEN are defined by the environment. (The former supercedes
+# the latter if available)
 
 EOF
 }

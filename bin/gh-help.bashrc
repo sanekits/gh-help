@@ -15,8 +15,13 @@ fi
 
 gh_enterprise() {
     # Enterprise-flavored 'gh' wrapper (we expect
-    # that GH_ENTERPRISE_TOKEN is defined in environment)
-    GH_TOKEN= GH_HOST=${GH_HOST_ENTERPRISE} command gh "$@"
+    # that GH_ENTERPRISE_TOKEN_2 is defined in environment.  If not,
+    # fall back to GH_ENTERPRISE_TOKEN)
+    #
+    # GH_HOST_ENTERPRISE belongs in ~/.gh-helprc
+    local tok=${GH_ENTERPRISE_TOKEN_2}
+    [[ -z "$tok" ]] && tok=${GH_ENTERPRISE_TOKEN}
+    GH_ENTERPRISE_TOKEN=${tok} GH_TOKEN=${tok} GH_HOST=${GH_HOST_ENTERPRISE} command gh "$@"
 }
 
 gh_pub() {
