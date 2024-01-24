@@ -40,9 +40,13 @@ make_gh_helprc() {
 
 # If Enterprise gh is available, set hostname here:
 export GH_HOST_ENTERPRISE=bbgithub.dev.bloomberg.com
+
 # Also, the `ghe` command expects that GH_ENTERPRISE_TOKEN_2 or
 # GH_ENTERPRISE_TOKEN are defined by the environment. (The former supercedes
 # the latter if available)
+
+unset GH_HOST  # overrule whomever thinks they know better. Our gh-help.bashrc
+               # owns this domain. (Don't install gh-help if you don't want that)
 
 EOF
 }
@@ -66,7 +70,7 @@ main() {
         builtin echo "~/.gh-helprc has been created: review and customize this file."
     }
     type -P gh || {
-        echo "WARNING: no 'gh' command found on the PATH.  If it's not installed, try $PWD/gh-help/gh-install.sh"
+        echo "WARNING: no 'gh' command found on the PATH.  If it's not installed, try 'apt-get install gh-cli'"
     }
     # FINALIZE: perms on ~/.local/bin/<Kitname>.  We want others/group to be
     # able to traverse dirs and exec scripts, so that a source installation can
