@@ -34,14 +34,14 @@ die() {
 }
 
 make_gh_helprc() {
-    cat <<-EOF
+    cat <<-"EOF"
 # gh-helprc
 #   See https://github.com/sanekits/gh-help
 
-# TODO: set this to point to the hostname for your Github Enterprise server.
-# Then the "ghe" alias will be enabled during shell init.
-
-# export GH_HOST_ENTERPRISE=myenterprise.local
+# If Enterprise gh is available, set hostname here:
+export GH_HOST_ENTERPRISE=bbgithub.dev.bloomberg.com
+# Also, the `ghe` command expects that GH_ENTERPRISE_TOKEN is
+# defined by the environment.
 
 EOF
 }
