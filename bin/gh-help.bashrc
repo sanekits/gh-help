@@ -25,8 +25,11 @@ gh_enterprise() {
 }
 
 gh_pub() {
-    # (We expect that GH_TOKEN is defined in environment)
-    GH_ENTERPRISE_TOKEN= GH_HOST=github.com command gh "$@"
+    # (We expect that GH_TOKEN_2 is defined in environment, fallback
+    # to GH_TOKEN if not)
+    local tok=${GH_TOKEN_2}
+    [[ -z "$tok" ]] && tok=${GH_TOKEN}
+    GH_TOKEN=${tok} GH_ENTERPRISE_TOKEN= GH_HOST=github.com command gh "$@"
 }
 
 alias ghe=gh_enterprise
