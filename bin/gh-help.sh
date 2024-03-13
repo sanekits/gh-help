@@ -40,6 +40,7 @@ ghil  # gh issue list  << List issues for this repo
 ghic  # gh issue create  << Create issue in this repo
 ghpl  # gh pr list     << List PRs for this repo
 ghpr  # gh pr create   << Create PR for this repo
+ghe.sh # << Run gh in enterprise mode (e.g. scripts)
 XEOF
 }
 

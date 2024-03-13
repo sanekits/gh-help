@@ -4,7 +4,7 @@
 
 Download and install the self-extracting setup script:
 ```
-curl -L https://github.com/sanekits/gh-help/releases/download/0.4.4/gh-help-setup-0.4.4.sh \
+curl -L https://github.com/sanekits/gh-help/releases/download/0.4.5/gh-help-setup-0.4.5.sh \
     -o ~/tmp$$.sh && bash ~/tmp$$.sh && rm ~/tmp$$.sh
 ```
 
