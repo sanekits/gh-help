@@ -40,7 +40,10 @@ alias ghil='gh issue list'
 alias ghic='gh issue create'
 alias ghpl='gh issue list'
 alias ghpr='gh pr create'
+alias gh_gist='gh-gist.sh'
 alias gh_gist_create='gh-gist.sh create'
 alias ghe_gist_create='gh-gist.sh -e create'
+alias gh_gist_list='gh-gist.sh list'
+alias ghe_gist_list='gh-gist.sh -e list'
 
 true
