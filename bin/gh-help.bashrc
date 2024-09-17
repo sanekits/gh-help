@@ -45,5 +45,6 @@ alias gh_gist_create='gh-gist.sh create'
 alias ghe_gist_create='gh-gist.sh -e create'
 alias gh_gist_list='gh-gist.sh list'
 alias ghe_gist_list='gh-gist.sh -e list'
-
+alias gh_gist_edit='gh-gist.sh edit'
+alias ghe_gist_edit='gh-gist.sh -e edit'
 true

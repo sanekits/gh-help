@@ -19,6 +19,18 @@ make_generic_description() {
     echo "Created by ${USER} with $(basename ${scriptName}) on $(date -Iminutes)"
 }
 
+invoke_vscode() {
+    which code-server &>/dev/null && [[ $HOME == /root ]] && {
+        code-server --user-data-dir=/root/.config/code-server --no-sandbox "$@"
+        return
+    }
+    which code &>/dev/null && {
+        code "$@"
+        return
+    }
+    false
+}
+
 
 do_create() {
     # Create a new gist.  By default:
@@ -76,10 +88,14 @@ do_edit() {
     done < <(do_list "$@")
 
     [[ ${#items[@]} -eq 0 ]] && die "No gists matched."
+    [[ ${#items[@]} -gt 10 ]] && {
+        do_list "$@"
+        die "Too many matches.  I'm not in the mood to clone all that!"
+    }
     [[ -d ~/gist-edit ]] || mkdir -p ~/gist-edit
     for item in ${items[@]}; do
         gist_id=${item}
-        gist_dir=~/gist-edit/${gist_id}
+        gist_dir=${HOME}/gist-edit/${gist_id}
         if [[ ! -d ${gist_dir} ]]; then
             (cd ~/gist-edit && ${gh_command} gist clone ${gist_id})
         else
@@ -90,13 +106,13 @@ do_edit() {
         echo "Load ~/gist-edit/${gist_id} into editor? [y/N]"
         read -n1 answer
         [[ ${answer} == [yY] ]] && {
-            which code &>/dev/null && EDITOR="code -r"
+            invoke_vscode -n ~/gist-edit/${gist_id} && exit
             [[ -n "${EDITOR}" ]] || die "No editor found.  Set EDITOR environment variable."
             ${EDITOR} ${gist_dir}
         }
     else
         for item in ${items[@]}; do
-            echo "code -r ~/gist-edit/${item}"
+            echo "code -n ~/gist-edit/${item}"
         done
     fi
 
