@@ -139,7 +139,7 @@ do_edit() {
                 cd ~/gist-edit
                 ${gh_command} gist clone ${gist_id}
                 # Turn the description into a symlink name:
-                symlink_title=$( printf "%s\n" "${desc[@]}" | awk "/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }" | tr '/ \t' '-' )
+                symlink_title=$( printf "%s\n" "${desc[@]}" | awk "/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }" | tr '`\'?"$%/ \t' '-' )
                 # limit the title to 45 chars:
                 symlink_title=${symlink_title:0:45}
                 ln -sf ${gist_id} ${symlink_title}
@@ -161,7 +161,7 @@ do_edit() {
         }
     else
         for item in ${items[@]}; do
-            get_gist_title "$item"
+            get_title_for_hash "$item"
         done
     fi
 
