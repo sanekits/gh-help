@@ -187,6 +187,9 @@ gh_gist_help() {
     echo "        (Multiple filter args are combined with '.*' for regex)"
     echo "    -l [nn] Limit the number of gists listed."
     echo
+    echo "  edit [filter..args]              Edit existing gists."
+    echo "    Edit one or more existing gist by matching filters"
+    echo
 }
 
 [[ -z ${sourceMe} ]] && {
