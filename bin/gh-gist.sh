@@ -3,11 +3,12 @@
 
 scriptName="$(readlink -f "$0")"
 scriptDir=$(command dirname -- "${scriptName}")
-PS4='\033[0;33m+$?(${BASH_SOURCE}:${LINENO}):\033[0m ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+PS4='\033[0;33m+$?( $( realpath ${BASH_SOURCE} 2>/dev/null || echo unk-source ):${LINENO}  ):\033[0m ${#FUNCNAME[@]}:+${FUNCNAME[0]}()✨ '
 
 source ${scriptDir}/gh-help.bashrc
 
 gh_command=gh_pub  # -e|--enterprise option will set this to gh_enterprise()
+FIELD_NDX=()
 
 
 die() {
@@ -20,14 +21,18 @@ make_generic_description() {
 }
 
 invoke_vscode() {
-    which code-server &>/dev/null && [[ $HOME == /root ]] && {
-        code-server --user-data-dir=/root/.config/code-server --no-sandbox "$@"
+    if which code-server &>/dev/null; then
+        code-server "$@"
         return
-    }
-    which code &>/dev/null && {
-        code "$@"
-        return
-    }
+    elif which code &>/dev/null; then
+        if [[ ${HOME} == /root ]]; then
+            code --user-data-dir=/root/.config/code-server --no-sandbox "$@"
+            return
+        else
+            code "$@"
+            return
+        fi
+    fi
     false
 }
 
@@ -50,22 +55,33 @@ do_create() {
     [[ -z ${gistFile} ]] && die "No gist file specified."
     ${gh_command} gist create ${public:+-p} --filename "${filename}" ${description:+-d} "${description}" "${gistFile}"
 }
+
 do_list_raw() {
-    ${gh_command} gist list --limit "$1"
+    local limit="$1"
+    if [[ ${#FIELD_NDX[@]} -gt 0 ]]; then
+        # Join the array elements with commas to form the field list for cut
+        field_list=$(IFS=,; echo "${FIELD_NDX[*]}")
+        ${gh_command} gist list --limit "$limit" | cut -f"${field_list}" -d $'\t'
+    else
+        ${gh_command} gist list --limit "$limit"
+    fi
 }
 
 do_list() {
     # List gists.  Arguments are used to filter the list by substring
     # matching against the id and description
     local limit=20 filter=()
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             -l) shift; limit=$1 ;;
+            -f) shift; FIELD_NDX+=($1) ;;
             -*) die "Unknown list option: $1";;
             *) filter+=($1);;
         esac
         shift
     done
+
     if [[ ${#filter[@]} -gt 0 ]]; then
         # Expand filter elements into a single string with '.*' between them for grep
         filter_string=$(printf '.*%s' "${filter[@]}")
@@ -73,6 +89,7 @@ do_list() {
     else
         do_list_raw "$limit"
     fi
+    FIELD_NDX=()
 }
 
 do_edit() {
@@ -85,7 +102,7 @@ do_edit() {
     while read id text; do
         items+=(${id})
         desc+=("${id} ${text}")
-    done < <(do_list "$@")
+    done < <(do_list -f 1 -f 2 "$@")
 
     [[ ${#items[@]} -eq 0 ]] && die "No gists matched."
     [[ ${#items[@]} -gt 10 ]] && {
@@ -97,12 +114,22 @@ do_edit() {
         gist_id=${item}
         gist_dir=${HOME}/gist-edit/${gist_id}
         if [[ ! -d ${gist_dir} ]]; then
-            (cd ~/gist-edit && ${gh_command} gist clone ${gist_id})
+            (
+                set -ue
+                cd ~/gist-edit
+                ${gh_command} gist clone ${gist_id}
+                # Turn the description into a symlink name:
+                symlink_title=$( printf "%s\n" "${desc[@]}" | awk "/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }" | tr '/ \t' '-' )
+                # limit the title to 45 chars:
+                symlink_title=${symlink_title:0:45}
+                echo "symlink_title: ${symlink_title}"
+                ln -sf ${gist_id} ${symlink_title}
+            )
         else
             (cd ${gist_dir} && git pull)
         fi
     done
-    if [[ ${#items[@]} -eq 1 ]]; then
+    if [[ ${#items[@]} -eq 1 && -t 1 ]]; then
         echo "Load ~/gist-edit/${gist_id} into editor? [y/N]"
         read -n1 answer
         [[ ${answer} == [yY] ]] && {
@@ -112,7 +139,7 @@ do_edit() {
         }
     else
         for item in ${items[@]}; do
-            echo "code -n ~/gist-edit/${item}"
+            echo "${HOME}/gist-edit/${item}"
         done
     fi
 
@@ -156,3 +183,4 @@ gh_gist_help() {
     die "No mode specified. Try 'create' or -h for help."
 }
 command true
++
