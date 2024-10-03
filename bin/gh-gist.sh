@@ -92,6 +92,26 @@ do_list() {
     FIELD_NDX=()
 }
 
+get_title_for_hash() {
+    # Given hashed dirname(s) in ~/gist-edit, print the basename of the title symlink which
+    # points to it
+    local hash
+    for hash in "$@"; do
+    (
+        set -ue
+        builtin cd ${HOME}/gist-edit
+        links=(  $( find . -maxdepth 1 -type l | cut -c 3- )  )
+        for link in ${links[@]}; do
+            if [[ $( readlink ${link} ) == *${hash} ]]; then
+                echo ${link}
+                exit
+            fi
+        done
+        echo "${hash}"
+    )
+    done
+}
+
 do_edit() {
     # Edit one or more gists.  Each is cloned to ~/gist-edit/<id> first, if not
     # already there.  Existing gists are refreshed with 'git pull'
@@ -122,24 +142,26 @@ do_edit() {
                 symlink_title=$( printf "%s\n" "${desc[@]}" | awk "/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }" | tr '/ \t' '-' )
                 # limit the title to 45 chars:
                 symlink_title=${symlink_title:0:45}
-                echo "symlink_title: ${symlink_title}"
                 ln -sf ${gist_id} ${symlink_title}
+                cd ${symlink_title}
+                echo "$PWD 1" >> ~/.tox-index
             )
         else
             (cd ${gist_dir} && git pull)
         fi
     done
     if [[ ${#items[@]} -eq 1 && -t 1 ]]; then
-        echo "Load ~/gist-edit/${gist_id} into editor? [y/N]"
+        gist_title="$(get_title_for_hash ${gist_id})"
+        echo "Load ~/gist-edit/${gist_title} into editor? [y/N]"
         read -n1 answer
         [[ ${answer} == [yY] ]] && {
-            invoke_vscode -n ~/gist-edit/${gist_id} && exit
+            invoke_vscode -n ~/gist-edit/${gist_title} && exit
             [[ -n "${EDITOR}" ]] || die "No editor found.  Set EDITOR environment variable."
-            ${EDITOR} ${gist_dir}
+            ${EDITOR} ${gist_title}
         }
     else
         for item in ${items[@]}; do
-            echo "${HOME}/gist-edit/${item}"
+            get_gist_title "$item"
         done
     fi
 
