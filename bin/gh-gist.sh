@@ -5,19 +5,19 @@ scriptName="$(readlink -f "$0")"
 scriptDir=$(command dirname -- "${scriptName}")
 PS4='\033[0;33m+$?( $( realpath ${BASH_SOURCE} 2>/dev/null || echo unk-source ):${LINENO}  ):\033[0m ${#FUNCNAME[@]}:+${FUNCNAME[0]}()✨ '
 
-source ${scriptDir}/gh-help.bashrc
+source "${scriptDir}/gh-help.bashrc"
 
 gh_command=gh_pub  # -e|--enterprise option will set this to gh_enterprise()
 FIELD_NDX=()
 
 
 die() {
-    builtin echo "ERROR($(basename ${scriptName})): $*" >&2
+    builtin echo "ERROR($(basename "${scriptName}")): $*" >&2
     builtin exit 1
 }
 
 make_generic_description() {
-    echo "Created by ${USER} with $(basename ${scriptName}) on $(date -Iminutes)"
+    echo "Created by ${USER} with $(basename "${scriptName}") on $(date -Iminutes)"
 }
 
 invoke_vscode() {
@@ -42,7 +42,8 @@ do_create() {
     #   - we read from stdin and name the file README.md.
     #   - we make the gist public.  (-v|--private will make it private)
     #   - we provide a generic description.
-    local description="$(make_generic_description)" gistFile=- public=1 filename=README.md
+    local description;
+    description="$(make_generic_description)" gistFile=- public=1 filename=README.md
     while [[ $# -gt 0 ]]; do
         case $1 in
             -d|--description) shift; description="$1"; shift; continue;;
@@ -75,9 +76,9 @@ do_list() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             -l) shift; limit=$1 ;;
-            -f) shift; FIELD_NDX+=($1) ;;
+            -f) shift; FIELD_NDX+=("$1") ;;
             -*) die "Unknown list option: $1";;
-            *) filter+=($1);;
+            *) filter+=("$1");;
         esac
         shift
     done
@@ -99,11 +100,12 @@ get_title_for_hash() {
     for hash in "$@"; do
     (
         set -ue
-        builtin cd ${HOME}/gist-edit
+        builtin cd "${HOME}/gist-edit"
+        # shellcheck disable=SC2207
         links=(  $( find . -maxdepth 1 -type l | cut -c 3- )  )
-        for link in ${links[@]}; do
-            if [[ $( readlink ${link} ) == *${hash} ]]; then
-                echo ${link}
+        for link in "${links[@]}"; do
+            if [[ $( readlink "${link}" ) == *${hash} ]]; then
+                echo "${link}"
                 exit
             fi
         done
@@ -119,56 +121,58 @@ do_edit() {
 
     local items=()
     local desc=()
-    while read id text; do
-        items+=(${id})
+    while read -r id text; do
+        items+=("${id}")
         desc+=("${id} ${text}")
     done < <(do_list -f 1 -f 2 "$@")
 
     [[ ${#items[@]} -eq 0 ]] && die "No gists matched."
-    [[ ${#items[@]} -gt 10 ]] && {
+    if [[ ${#items[@]} -gt 10 ]]; then
         do_list "$@"
         die "Too many matches.  I'm not in the mood to clone all that!"
-    }
+    fi
     [[ -d ~/gist-edit ]] || mkdir -p ~/gist-edit
-    for item in ${items[@]}; do
+
+    for item in "${items[@]}"; do
         gist_id=${item}
         gist_dir=${HOME}/gist-edit/${gist_id}
         if [[ ! -d ${gist_dir} ]]; then
             (
                 set -ue
                 cd ~/gist-edit
-                ${gh_command} gist clone ${gist_id}
+                ${gh_command} gist clone "${gist_id}"
                 # Turn the description into a symlink name:
-                symlink_title=$( printf "%s\n" "${desc[@]}" | awk "/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }" | tr '`\'?"$%/ \t' '-' )
+                awk_arg="/^${gist_id}/ { \$1=\"\"; sub(/^ /, \"\"); print }"
+                tr_arg='\\?\$%/ \t'
+                symlink_title=$( printf "%s\n" "${desc[@]}" | awk "$awk_arg"  | tr "$tr_arg" '-' )
                 # limit the title to 45 chars:
                 symlink_title=${symlink_title:0:45}
-                ln -sf ${gist_id} ${symlink_title}
-                cd ${symlink_title}
+                ln -sf "${gist_id}" "${symlink_title}"
+                builtin cd "${symlink_title}"
                 echo "$PWD 1" >> ~/.tox-index
             )
         else
-            (cd ${gist_dir} && git pull)
+            (builtin cd "${gist_dir}" && git pull)
         fi
     done
     if [[ ${#items[@]} -eq 1 && -t 1 ]]; then
-        gist_title="$(get_title_for_hash ${gist_id})"
+        gist_title="$(get_title_for_hash "${gist_id}")"
         echo "Load ~/gist-edit/${gist_title} into editor? [y/N]"
-        read -n1 answer
-        [[ ${answer} == [yY] ]] && {
-            invoke_vscode -n ~/gist-edit/${gist_title} && exit
+        read -rn1 answer
+        if [[ ${answer} == [yY] ]]; then
+            invoke_vscode -n "${HOME}/gist-edit/${gist_title}" && exit
             [[ -n "${EDITOR}" ]] || die "No editor found.  Set EDITOR environment variable."
-            ${EDITOR} ${gist_title}
-        }
+            ${EDITOR} "${gist_title}"
+        fi
     else
-        for item in ${items[@]}; do
+        for item in "${items[@]}"; do
             get_title_for_hash "$item"
         done
     fi
-
 }
 
 gh_gist_help() {
-    echo "Usage: $(basename ${scriptName}) [mode] <OPTIONS> <FILE>"
+    echo "Usage: $(basename "${scriptName}") [mode] <OPTIONS> <FILE>"
     echo "Gist management helper"
     echo "Options:"
     echo "  -e, --enterprise               Use GitHub Enterprise."
@@ -192,7 +196,7 @@ gh_gist_help() {
     echo
 }
 
-[[ -z ${sourceMe} ]] && {
+if [[ -z ${sourceMe} ]]; then
     while [[ $# -gt 0 ]]; do
         case $1 in
             create) shift; do_create "$@"; exit;;
@@ -200,12 +204,12 @@ gh_gist_help() {
             edit) shift; do_edit "$@"; exit;;
             -e|--enterprise) shift; gh_command=gh_enterprise; continue;;
             -h|--help) shift; gh_gist_help "$@"; exit;;
-            *) gh_gist_help; die "Unknown option(s): $@" ;;
+            *) gh_gist_help; die "Unknown option(s): $*" ;;
         esac
         shift
     done
     gh_gist_help
     die "No mode specified. Try 'create' or -h for help."
-}
+fi
 command true
 +
