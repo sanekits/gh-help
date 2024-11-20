@@ -4,7 +4,7 @@ gh-help-semaphore() {
     [[ 1 -eq  1 ]]
 }
 
-GH_HELP_BASE="${GH_HELP_BASE:-$HOME/.local/bin/gh-help}"
+export GH_HELP_BASE="${GH_HELP_BASE:-$HOME/.local/bin/gh-help}"
 
 [[ -f ~/.gh-helprc ]] \
     && source ~/.gh-helprc
@@ -12,6 +12,9 @@ GH_HELP_BASE="${GH_HELP_BASE:-$HOME/.local/bin/gh-help}"
 if which gh &>/dev/null; then
     eval "$(command gh completion -s bash)"
 fi
+
+# TODO: move this to a conig file:
+export GH_MYORGS="$USER training-$USER org-$USER sanekits trn-bde-ci TdocProgressMetrics"
 
 gh_enterprise() {
     # Enterprise-flavored 'gh' wrapper (we expect
