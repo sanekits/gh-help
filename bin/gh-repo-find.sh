@@ -25,6 +25,8 @@ gh_help_find() {
     builtin echo "  GREP_ARGS          Args passed to grep"
     builtin echo "  ORGNAME            Organization name, defaults to the value"
     builtin echo "                     of the GH_MYORGS environment variable."
+    builtin echo "  GH_MYORGS=${GH_MYORGS}"
+    builtin echo
     builtin echo "  Example: $(basename ${scriptName}) -o myorg -- -E '^.*foobar[0-9]+.*$'"
 }
 
@@ -40,6 +42,7 @@ set +u
         esac
         shift
     done
+    [[ $# -eq 0 ]] && { gh_help_find; exit 1; }
     set -u
     set -o pipefail
     for org in $ORG_LIST; do

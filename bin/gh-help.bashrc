@@ -50,4 +50,5 @@ alias gh_gist_list='gh-gist.sh list'
 alias ghe_gist_list='gh-gist.sh -e list'
 alias gh_gist_edit='gh-gist.sh edit'
 alias ghe_gist_edit='gh-gist.sh -e edit'
+alias ghe_repo_find='gh-repo-find.sh -e'
 true
