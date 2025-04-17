@@ -13,7 +13,7 @@ if which gh &>/dev/null; then
     eval "$(command gh completion -s bash)"
 fi
 
-# TODO: move this to a conig file:
+# TODO: move this to a config file:
 export GH_MYORGS="$USER training-$USER org-$USER sanekits trn-bde-ci TdocProgressMetrics"
 
 gh_enterprise() {
