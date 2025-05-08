@@ -79,7 +79,7 @@ main() {
         builtin echo "~/.gh-helprc has been created: review and customize this file."
     }
     type -P gh || {
-        echo "WARNING: no 'gh' command found on the PATH.  If it's not installed, try 'apt-get install gh-cli'"
+        echo "WARNING: no 'gh' command found on the PATH.  If it's not installed, try 'apt-get install gh-cli' or ~/.local/bin/gh-cli-bootstrap.sh'"
     }
     # FINALIZE: perms on ~/.local/bin/<Kitname>.  We want others/group to be
     # able to traverse dirs and exec scripts, so that a source installation can
